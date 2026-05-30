@@ -12,9 +12,17 @@ export function LottieLogo({ className }: { className?: string }) {
       container: ref.current,
       renderer: "svg",
       loop: false,
-      autoplay: true,
+      autoplay: false,
       path: "/ai-guys-animation.json",
     });
+
+    // The animation fades in then fades back out over its full length.
+    // Play only the first half so it lands fully revealed and holds there.
+    anim.addEventListener("DOMLoaded", () => {
+      const mid = Math.round(anim.totalFrames / 2);
+      anim.playSegments([0, mid], true);
+    });
+
     return () => anim.destroy();
   }, []);
 

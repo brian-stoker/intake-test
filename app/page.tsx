@@ -15,6 +15,7 @@ import { LottieLogo } from "./LottieLogo";
 type LoadedFile = { id: string; name: string; content: string };
 type Delivery = { dest: string; status: number; error?: string };
 type Result = {
+  source: string;
   lead?: Record<string, string>;
   delivery?: Delivery;
   error?: string;
@@ -33,7 +34,7 @@ export default function Home() {
   const [draft, setDraft] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Result | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
   const dragDepth = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -111,28 +112,46 @@ export default function Home() {
     });
   };
 
-  async function process() {
-    if (!hasContent || loading) return;
-    setLoading(true);
-    setResult(null);
+  async function processOne(source: string, content: string): Promise<Result> {
     try {
       const res = await fetch("/api/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: currentContent }),
+        body: JSON.stringify({ input: content }),
       });
-      setResult(await res.json());
+      return { source, ...(await res.json()) };
     } catch (e) {
-      setResult({ error: e instanceof Error ? e.message : "request failed" });
-    } finally {
-      setLoading(false);
+      return { source, error: e instanceof Error ? e.message : "request failed" };
     }
+  }
+
+  async function processCurrent() {
+    if (!hasContent || loading) return;
+    setLoading(true);
+    setResults([]);
+    const source = activeFile ? activeFile.name : "Pasted text";
+    setResults([await processOne(source, currentContent)]);
+    setLoading(false);
+  }
+
+  async function processAll() {
+    const targets = files.filter((f) => f.content.trim().length > 0);
+    if (targets.length === 0 || loading) return;
+    setLoading(true);
+    setResults([]);
+    // Sequential so Slack messages land in order and we don't hammer the API.
+    const out: Result[] = [];
+    for (const f of targets) {
+      out.push(await processOne(f.name, f.content));
+      setResults([...out]);
+    }
+    setLoading(false);
   }
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault();
-      process();
+      processCurrent();
     }
   };
 
@@ -141,8 +160,7 @@ export default function Home() {
     return m ? m[1].toLowerCase() : "txt";
   };
 
-  const delivery = result?.delivery;
-  const sent = delivery && delivery.status >= 200 && delivery.status < 300;
+  const multiple = files.length > 1;
 
   return (
     <div
@@ -169,9 +187,8 @@ export default function Home() {
                 Intake · Live
               </span>
             </div>
-            <h1 className="flex items-center gap-3 text-4xl font-semibold tracking-tight leading-tight">
-              <LottieLogo className="h-12 w-12 shrink-0" />
-              <span className="text-neutral-500">Intake</span>
+            <h1 className="text-4xl font-semibold tracking-tight leading-tight">
+              A.I. Guys <span className="text-neutral-500">Intake</span>
             </h1>
             <p className="mt-2 text-neutral-400 max-w-md">
               Messy input → structured lead → delivered, in one paste.
@@ -321,60 +338,90 @@ export default function Home() {
               to process
             </span>
           </div>
-          <button
-            type="button"
-            onClick={process}
-            disabled={!hasContent || loading}
-            className="px-4 py-2 rounded-md bg-[#a3e635] text-black text-sm font-semibold hover:bg-[#bef264] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#a3e635] shadow-[0_0_0_3px_rgba(163,230,53,0.12)]"
-          >
-            {loading ? "Processing…" : "Process"}
-          </button>
+          <div className="flex gap-2">
+            {multiple && (
+              <button
+                type="button"
+                onClick={processAll}
+                disabled={loading}
+                className="px-3.5 py-2 rounded-md border border-[#16304d] bg-[#0d2038] text-sm font-medium text-neutral-200 hover:border-[#1d3e63] hover:bg-[#163050] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {loading ? "Processing…" : `Process all (${files.length})`}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={processCurrent}
+              disabled={!hasContent || loading}
+              className="px-4 py-2 rounded-md bg-[#a3e635] text-black text-sm font-semibold hover:bg-[#bef264] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#a3e635] shadow-[0_0_0_3px_rgba(163,230,53,0.12)]"
+            >
+              {loading ? "Processing…" : multiple ? "Process current" : "Process"}
+            </button>
+          </div>
         </div>
 
-        {/* Error */}
-        {result?.error && (
-          <div className="mt-6 rounded-xl border border-red-900/60 bg-red-950/40 p-4 text-sm text-red-300">
-            Error: {result.error}
-          </div>
-        )}
-
-        {/* Result card */}
-        {result?.lead && (
-          <div className="mt-6 overflow-hidden rounded-xl border border-[#1d3e63] bg-editor shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)]">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#1d3e63] bg-editor-header">
-              <span className="text-[11px] tracking-wider uppercase text-neutral-400 font-medium">
-                Structured lead
-              </span>
-            </div>
-            <div className="divide-y divide-[#16304d]">
-              {leadSchema.fields.map((f) => (
-                <div key={f.key} className="flex gap-4 px-4 py-3">
-                  <span className="w-24 shrink-0 text-[11px] tracking-wider uppercase text-neutral-500 font-medium pt-0.5">
-                    {f.label}
-                  </span>
-                  <span className="text-sm text-neutral-100 break-words whitespace-pre-wrap">
-                    {result.lead?.[f.key] || "—"}
-                  </span>
-                </div>
-              ))}
-            </div>
-            {delivery && (
+        {/* Results */}
+        {results.map((result, i) => {
+          const delivery = result.delivery;
+          const sent =
+            delivery && delivery.status >= 200 && delivery.status < 300;
+          if (result.error) {
+            return (
               <div
-                className={[
-                  "px-4 py-3 text-sm font-medium border-t",
-                  sent
-                    ? "border-[#a3e635]/30 bg-[#a3e635]/10 text-[#a3e635]"
-                    : "border-amber-700/40 bg-amber-950/40 text-amber-300",
-                ].join(" ")}
+                key={i}
+                className="mt-6 rounded-xl border border-red-900/60 bg-red-950/40 p-4 text-sm text-red-300"
               >
-                {sent ? "✅ Sent" : "⚠️ Delivery issue"} to #{delivery.dest} · HTTP{" "}
-                {delivery.status}
-                {delivery.error ? ` · ${delivery.error}` : ""}
+                <span className="font-medium text-red-200">{result.source}</span>{" "}
+                — Error: {result.error}
               </div>
-            )}
-          </div>
-        )}
+            );
+          }
+          return (
+            <div
+              key={i}
+              className="mt-6 overflow-hidden rounded-xl border border-[#1d3e63] bg-editor shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)]"
+            >
+              <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-[#1d3e63] bg-editor-header">
+                <span className="text-[11px] tracking-wider uppercase text-neutral-400 font-medium">
+                  Structured lead
+                </span>
+                <span className="text-[11px] text-neutral-500 font-mono-display truncate max-w-[260px]">
+                  {result.source}
+                </span>
+              </div>
+              <div className="divide-y divide-[#16304d]">
+                {leadSchema.fields.map((f) => (
+                  <div key={f.key} className="flex gap-4 px-4 py-3">
+                    <span className="w-24 shrink-0 text-[11px] tracking-wider uppercase text-neutral-500 font-medium pt-0.5">
+                      {f.label}
+                    </span>
+                    <span className="text-sm text-neutral-100 break-words whitespace-pre-wrap">
+                      {result.lead?.[f.key] || "—"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {delivery && (
+                <div
+                  className={[
+                    "px-4 py-3 text-sm font-medium border-t",
+                    sent
+                      ? "border-[#a3e635]/30 bg-[#a3e635]/10 text-[#a3e635]"
+                      : "border-amber-700/40 bg-amber-950/40 text-amber-300",
+                  ].join(" ")}
+                >
+                  {sent ? "✅ Sent" : "⚠️ Delivery issue"} to #{delivery.dest} ·
+                  HTTP {delivery.status}
+                  {delivery.error ? ` · ${delivery.error}` : ""}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </main>
+
+      {/* Animated A.I. Guys logo, bottom center */}
+      <LottieLogo className="pointer-events-none fixed bottom-6 left-1/2 -translate-x-1/2 h-40 w-40 sm:h-52 sm:w-52" />
     </div>
   );
 }
