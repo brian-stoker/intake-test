@@ -11,3 +11,7 @@ next-env.d.ts
 .env*.local
 
 .DS_Store
+
+# design reference, not part of the Next app
+magic-redesign
+ai-guys-animation.html
