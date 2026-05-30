@@ -1,0 +1,13 @@
+{
+  "lastUpdate": 1780134616133,
+  "lastValidate": 1780134616133,
+  "metaVersion": "0.4.0",
+  "packages": [],
+  "products": [
+    {
+      "description": "intake-test repository",
+      "name": "intake-test",
+      "packages": []
+    }
+  ]
+}
