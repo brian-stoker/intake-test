@@ -11,7 +11,7 @@ export function LottieLogo({ className }: { className?: string }) {
     const anim: AnimationItem = lottie.loadAnimation({
       container: ref.current,
       renderer: "svg",
-      loop: true,
+      loop: false,
       autoplay: true,
       path: "/ai-guys-animation.json",
     });

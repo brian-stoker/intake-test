@@ -146,7 +146,7 @@ export default function Home() {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-[#07080a] text-[#e8eaed] flex justify-center py-16 px-4 overflow-hidden"
+      className="relative min-h-screen w-full bg-[#0a1a2f] text-[#e8eaed] flex justify-center py-16 px-4 overflow-hidden"
       onDragEnter={onDragEnter}
       onDragLeave={onDragLeave}
       onDragOver={onDragOver}
@@ -154,13 +154,13 @@ export default function Home() {
     >
       <div className="absolute inset-0 bg-ambient pointer-events-none" />
       <div className="absolute inset-0 bg-grid pointer-events-none opacity-40" />
-      <div className="absolute inset-x-0 top-0 h-px bg-[#1f2329] pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-px bg-[#16304d] pointer-events-none" />
 
       <main className="relative w-[820px] max-w-full">
         {/* Header */}
         <header className="mb-8 flex items-start justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 mb-3 px-2.5 py-1 rounded-full border border-[#1f2329] bg-[#0d0f12]">
+            <div className="inline-flex items-center gap-2 mb-3 px-2.5 py-1 rounded-full border border-[#16304d] bg-[#0d2038]">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-[#a3e635] opacity-60 animate-ping" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#a3e635]" />
@@ -217,7 +217,7 @@ export default function Home() {
 
         {/* File chips */}
         {files.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3 p-2 rounded-lg border border-[#1f2329] bg-[#0a0c0e]">
+          <div className="flex flex-wrap gap-1.5 mb-3 p-2 rounded-lg border border-[#16304d] bg-[#0a1a2f]">
             {files.map((f) => {
               const active = f.id === activeId;
               return (
@@ -228,13 +228,13 @@ export default function Home() {
                     "group inline-flex items-center gap-2 pl-2 pr-1 py-1 rounded-md text-sm border transition-all cursor-pointer",
                     active
                       ? "bg-[#a3e635] text-black border-[#a3e635] shadow-[0_0_0_3px_rgba(163,230,53,0.15)]"
-                      : "bg-[#0d0f12] text-neutral-300 border-[#1f2329] hover:border-[#2a2f37] hover:bg-[#141821]",
+                      : "bg-[#0d2038] text-neutral-300 border-[#16304d] hover:border-[#1d3e63] hover:bg-[#163050]",
                   ].join(" ")}
                 >
                   <span
                     className={[
                       "inline-flex items-center justify-center w-5 h-5 rounded text-[9px] font-mono-display font-semibold uppercase",
-                      active ? "bg-black/20 text-black" : "bg-[#1a1d22] text-neutral-400",
+                      active ? "bg-black/20 text-black" : "bg-[#16304d] text-neutral-400",
                     ].join(" ")}
                   >
                     {fileExt(f.name)}
@@ -248,7 +248,7 @@ export default function Home() {
                     }}
                     className={[
                       "p-0.5 rounded transition-colors",
-                      active ? "hover:bg-black/15" : "hover:bg-[#1f2329]",
+                      active ? "hover:bg-black/15" : "hover:bg-[#16304d]",
                     ].join(" ")}
                     aria-label={`Remove ${f.name}`}
                   >
@@ -264,10 +264,10 @@ export default function Home() {
         <div
           className={[
             "relative rounded-xl border transition-colors shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset,0_20px_60px_-20px_rgba(0,0,0,0.8)] overflow-hidden",
-            isDragging ? "border-[#a3e635] border-dashed bg-editor" : "border-[#2a2f37] bg-editor",
+            isDragging ? "border-[#a3e635] border-dashed bg-editor" : "border-[#1d3e63] bg-editor",
           ].join(" ")}
         >
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#2a2f37] bg-editor-header">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1d3e63] bg-editor-header">
             <div className="flex items-center gap-2 min-w-0">
               <FileTextIcon className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
               <span className="text-xs text-neutral-400 truncate font-medium">
@@ -290,8 +290,8 @@ export default function Home() {
           />
 
           {isDragging && (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[#07080a]/80 backdrop-blur-sm">
-              <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-[#a3e635]/40 bg-[#0d0f12] text-sm text-[#a3e635] font-medium">
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[#0a1a2f]/80 backdrop-blur-sm">
+              <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-[#a3e635]/40 bg-[#0d2038] text-sm text-[#a3e635] font-medium">
                 <UploadIcon className="w-4 h-4" />
                 Drop .md or .txt files to add
               </div>
@@ -314,7 +314,7 @@ export default function Home() {
               )}
             </span>
             <span className="hidden sm:inline-flex items-center gap-1 text-neutral-600">
-              <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-[#1f2329] bg-[#0d0f12] font-mono-display text-[10px]">
+              <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-[#16304d] bg-[#0d2038] font-mono-display text-[10px]">
                 <CommandIcon className="w-2.5 h-2.5" />
                 <CornerDownLeftIcon className="w-2.5 h-2.5" />
               </kbd>
@@ -340,13 +340,13 @@ export default function Home() {
 
         {/* Result card */}
         {result?.lead && (
-          <div className="mt-6 overflow-hidden rounded-xl border border-[#2a2f37] bg-editor shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)]">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#2a2f37] bg-editor-header">
+          <div className="mt-6 overflow-hidden rounded-xl border border-[#1d3e63] bg-editor shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)]">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#1d3e63] bg-editor-header">
               <span className="text-[11px] tracking-wider uppercase text-neutral-400 font-medium">
                 Structured lead
               </span>
             </div>
-            <div className="divide-y divide-[#1f2329]">
+            <div className="divide-y divide-[#16304d]">
               {leadSchema.fields.map((f) => (
                 <div key={f.key} className="flex gap-4 px-4 py-3">
                   <span className="w-24 shrink-0 text-[11px] tracking-wider uppercase text-neutral-500 font-medium pt-0.5">
