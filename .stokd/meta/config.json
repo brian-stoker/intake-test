@@ -1,8 +1,10 @@
 {
-  "lastUpdate": 1780134616133,
+  "lastUpdate": 1780187258233,
   "lastValidate": 1780134616133,
   "metaVersion": "0.4.0",
-  "packages": [],
+  "packages": [
+    "magic-redesign"
+  ],
   "products": [
     {
       "description": "intake-test repository",

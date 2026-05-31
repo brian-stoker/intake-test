@@ -30,7 +30,7 @@ aws for stokd.cloud is in the stokd-cloud aws profile
 
 ## 1. TL;DR
 
-LeadDrop takes any messy inbound — a forwarded inquiry email, a rambling voicemail transcript, or a malformed CSV row — and uses Claude to extract a clean, structured lead (who, how to reach them, what they want, how urgent, budget signal, and a ready-to-send reply). The result renders on screen and is simultaneously pushed to a Slack/Discord channel so a human sees it land in real time.
+Intake takes any messy inbound — a forwarded inquiry email, a rambling voicemail transcript, or a malformed CSV row — and uses Claude to extract a clean, structured lead (who, how to reach them, what they want, how urgent, budget signal, and a ready-to-send reply). The result renders on screen and is simultaneously pushed to a Slack/Discord channel so a human sees it land in real time.
 
 The task as written by A.I. Guys is generic ("messy input → LLM → structured summary → webhook"). This PRD intentionally **specializes that task into the actual job they hire for**: field automation for local SMBs, where pay is per *converted* project. The build is the artifact; the strategy is the point.
 
